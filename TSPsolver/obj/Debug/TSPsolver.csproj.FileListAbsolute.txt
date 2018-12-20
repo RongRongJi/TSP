@@ -1,0 +1,9 @@
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\bin\Debug\TSPsolver.exe.config
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\bin\Debug\TSPsolver.exe
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\bin\Debug\TSPsolver.pdb
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Debug\TSPsolver.csprojAssemblyReference.cache
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Debug\TSPsolver.Properties.Resources.resources
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Debug\TSPsolver.csproj.GenerateResource.cache
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Debug\TSPsolver.csproj.CoreCompileInputs.cache
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Debug\TSPsolver.exe
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Debug\TSPsolver.pdb
