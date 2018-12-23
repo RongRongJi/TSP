@@ -24,7 +24,6 @@ namespace TSPsolver
         public Form1()
         {
             InitializeComponent();
-            sa = new SimulatedAnnealing(ResultArea);
         }
 
         private void Start(object sender, EventArgs e) {
@@ -73,16 +72,11 @@ namespace TSPsolver
                 pointf[i].Y = point[i].Y / scaleRateY;
             }
 
-            new Thread((ThreadStart)delegate
-            {
-                sa.simulateAnnealing(point, pointf);
-                Invoke((EventHandler)delegate
-                {
-                    StartButton.Enabled = true;
-                    TimeSpan timeSpan = DateTime.Now - start;
-                });
-            })
-            { IsBackground = true }.Start();
+            sa = new SimulatedAnnealing(ResultArea,point,pointf);
+            sa.InitPosition(ref pointf, ref point);
+            sa.timer.Enabled = true;
+            StartButton.Enabled = true;
+
         }
     }
 

@@ -12,6 +12,8 @@ namespace TSPsolver
         Random random = new Random();
         Bitmap origin;
         int areaWidth, areaHeight;
+        public System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+        int ticker = 0;
         private int[] operate = new int[3];
         const int optInit = 500;
         const double Temperature = 1.2;
@@ -19,142 +21,164 @@ namespace TSPsolver
         const int markov = 15000;
         const int Limit = markov / 5;
         const int BLimit = markov / 15;
+        Point[] point;
+        PointF[] pointf;
         PictureBox ResultArea;
-        public SimulatedAnnealing(PictureBox ra)
+        double currentDistant;
+        double tmp, de, best;
+        double t = Temperature;
+        PointF[] bestPathf;
+        PointF[] tmpPointf;
+        Point[] bestPath;
+        Point[] tmpPoint;
+        bool isBlock = false;
+        bool isChange;
+        int l1 = 0, l2 = 0, whichOperate;
+
+        public SimulatedAnnealing(PictureBox ra,Point[] point,PointF[] pointf)
         {
             ResultArea = ra;
             areaWidth = ra.Width;
             areaHeight = ra.Height;
-        }
-
-        //模拟退火法
-        public void simulateAnnealing(Point[] point,PointF[] pointf)
-        {
+            timer = new System.Windows.Forms.Timer();
+            timer.Interval = 1;
+            timer.Tick += new EventHandler(simulateAnnealing);
             operate[0] = optInit;
             operate[1] = optInit;
             operate[2] = optInit;
-            InitPosition(ref pointf, ref point);
-            double currentDistant = GetDistant(point);
-            double tmp, de, best;
-            double t = Temperature;
-            PointF[] bestPathf = new PointF[pointf.Length];
-            Point[] bestPath = new Point[point.Length];
-            Point[] tmpPoint = new Point[point.Length];
-            PointF[] tmpPointf = new PointF[pointf.Length];
-            bool isBlock = false;
-            bool isChange;
-            int l1 = 0, l2 = 0, whichOperate;
-            best = currentDistant;
+            this.point = point;
+            this.pointf = pointf;
 
-            while (true)
+        }
+
+        //模拟退火法
+        public void simulateAnnealing(Object sender,EventArgs eve)
+        {
+            
+            point.CopyTo(tmpPoint, 0);
+            pointf.CopyTo(tmpPointf, 0);
+            whichOperate = GetNext(point, pointf);
+            tmp = GetDistant(point);
+            de = currentDistant - tmp;
+            isChange = false;
+            if (de > 0)
             {
-                for(int i = 0; i < markov; i++)
+                operate[whichOperate]++;
+                currentDistant = tmp;
+                isChange = true;
+                l1 = 0;
+                l2 = 0;
+                if (tmp < best)
                 {
-                    point.CopyTo(tmpPoint, 0);
-                    pointf.CopyTo(tmpPointf, 0);
-                    whichOperate = GetNext(point, pointf);
-                    tmp = GetDistant(point);
-                    de = currentDistant - tmp;
-                    isChange = false;
-                    if (de > 0)
+                    best = tmp;
+                    pointf.CopyTo(bestPathf, 0);
+                    point.CopyTo(bestPath, 0);
+                }
+            }
+            else
+            {
+                if (Math.Exp(de / t) > random.Next() / (double)System.Int32.MaxValue)
+                {
+                    currentDistant = tmp;
+                    isChange = true;
+                }
+                else
+                {
+                    tmpPoint.CopyTo(point, 0);
+                    tmpPointf.CopyTo(pointf, 0);
+                }
+                l1++;
+            }
+            if (isChange)
+            {
+                isBlock = true;
+                new Thread((ThreadStart)delegate {
+                    try
                     {
-                        operate[whichOperate]++;
-                        currentDistant = tmp;
-                        isChange = true;
-                        l1 = 0;
-                        l2 = 0;
-                        if (tmp < best)
+                        if (origin != null) origin.Dispose();
+                        origin = new Bitmap(areaWidth, areaHeight);
+                        using (Graphics g = Graphics.FromImage(origin))
                         {
-                            best = tmp;
-                            pointf.CopyTo(bestPathf, 0);
-                            point.CopyTo(bestPath, 0);
-                        }
-                    }
-                    else
-                    {
-                        if (Math.Exp(de / t) > random.Next() / (double)System.Int32.MaxValue)
-                        {
-                            currentDistant = tmp;
-                            isChange = true;
-                        }
-                        else
-                        {
-                            tmpPoint.CopyTo(point, 0);
-                            tmpPointf.CopyTo(pointf, 0);
-                        }
-                        l1++;
-                    }
-                    if (isChange)
-                    {
-                        while (isBlock)
-                        {
-                            Thread.Sleep(1);
-                        }
-                        isBlock = true;
-                        new Thread((ThreadStart)delegate
-                        {
-                            try
+                            using (GraphicsPath gpath = new GraphicsPath())
                             {
-                                if (origin != null) origin.Dispose();
-                                origin = new Bitmap(areaWidth, areaHeight);
-                                using (Graphics g = Graphics.FromImage(origin))
+                                gpath.AddPolygon(pointf);
+                                g.DrawPath(new Pen(Color.Black)
                                 {
-                                    using (GraphicsPath gpath = new GraphicsPath())
-                                    {
-                                        gpath.AddPolygon(pointf);
-                                        g.DrawPath(new Pen(Color.Black)
-                                        {
-                                            Width = 2
-                                        }, gpath);
-                                        ResultArea.Image = origin;
-                                    }
+                                    Width = 2
+                                }, gpath);
+                                ResultArea.Image = origin;
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show(e.Message);
+                        return;
+                    }
+                    isBlock = false;
+                }).Start();
+                
+            }
+            if (l1 > Limit)
+            {
+                l2++;
+                new Thread((ThreadStart)delegate {
+                    try
+                    {
+                        if (origin != null) origin.Dispose();
+                        origin = new Bitmap(areaWidth, areaHeight);
+                        using (Graphics g = Graphics.FromImage(origin))
+                        {
+                            using (GraphicsPath gpath = new GraphicsPath())
+                            {
+                                gpath.AddPolygon(bestPathf);
+                                g.DrawPath(new Pen(Color.Black) { Width = 2 }, gpath);
+                                ResultArea.Image = origin;
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show(e.Message);
+                    }
+                }).Start();
+                
+            }
+            ticker++;
+            if (ticker >= markov)
+            {
+                if (l2 > BLimit)
+                {
+                    new Thread((ThreadStart)delegate {
+                        try
+                        {
+                            if (origin != null) origin.Dispose();
+                            origin = new Bitmap(areaWidth, areaHeight);
+                            using (Graphics g = Graphics.FromImage(origin))
+                            {
+                                using (GraphicsPath gpath = new GraphicsPath())
+                                {
+                                    gpath.AddPolygon(bestPathf);
+                                    g.DrawPath(new Pen(Color.Black) { Width = 2 }, gpath);
+                                    ResultArea.Image = origin;
                                 }
                             }
-                            catch(Exception e)
-                            {
-                                MessageBox.Show(e.Message);
-                                return;
-                            }
-                            isBlock = false;
-                        }).Start();
-                    }
-                    if (l1 > Limit)
-                    {
-                        l2++;
-                        break;
-                    }
-                }
-                if (l2 > BLimit)
-                    break;
-                bestPath.CopyTo(point, 0);
-                bestPath.CopyTo(pointf, 0);
-                t *= delta;
-            }
-            while (isBlock) Thread.Sleep(1);
-            isBlock = true;
-            new Thread((ThreadStart)delegate
-            {
-                try
-                {
-                    if (origin != null) origin.Dispose();
-                    origin = new Bitmap(areaWidth, areaHeight);
-                    using (Graphics g = Graphics.FromImage(origin))
-                    {
-                        using (GraphicsPath gpath = new GraphicsPath())
-                        {
-                            gpath.AddPolygon(bestPathf);
-                            g.DrawPath(new Pen(Color.Black) { Width = 2 }, gpath);
-                            ResultArea.Image = origin;
                         }
-                    }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show(e.Message);
+                        }
+                        timer.Enabled = false;
+                    }).Start();
                 }
-                catch
-                {
-                    return;
-                }
+                bestPath.CopyTo(point, 0);
+                bestPathf.CopyTo(pointf, 0);
+                t *= delta;
+                ticker = 0;
                 isBlock = false;
-            }).Start();
+            }
         }
+
 
 
         //获得当前遍历路径长
@@ -224,7 +248,7 @@ namespace TSPsolver
         }
 
         //点位置初始化函数
-        private void InitPosition(ref PointF[] pointf,ref Point[] point)
+        public void InitPosition(ref PointF[] pointf,ref Point[] point)
         {
             List<int> list = new List<int>();
             Point[] tmp = new Point[point.Length];
@@ -242,6 +266,14 @@ namespace TSPsolver
             }
             tmp.CopyTo(point, 0);
             tmpf.CopyTo(pointf, 0);
+            currentDistant = GetDistant(point);
+            bestPathf = new PointF[pointf.Length];
+            bestPath = new Point[point.Length];
+            tmpPoint = new Point[point.Length];
+            tmpPointf = new PointF[pointf.Length];
+            isBlock = false;
+            best = currentDistant;
+            ticker = 0;
         }
     }
 }
