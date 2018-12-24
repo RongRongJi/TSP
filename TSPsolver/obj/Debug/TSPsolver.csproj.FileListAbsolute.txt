@@ -7,3 +7,6 @@ D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Debug\TSPso
 D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Debug\TSPsolver.csproj.CoreCompileInputs.cache
 D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Debug\TSPsolver.exe
 D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Debug\TSPsolver.pdb
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\bin\Debug\Microsoft.VisualBasic.PowerPacks.Vs.dll
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Debug\TSPsolver.Form1.resources
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Debug\TSPsolver.csproj.CopyComplete

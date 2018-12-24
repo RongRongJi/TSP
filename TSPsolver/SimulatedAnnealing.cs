@@ -41,7 +41,7 @@ namespace TSPsolver
             areaWidth = ra.Width;
             areaHeight = ra.Height;
             timer = new System.Windows.Forms.Timer();
-            timer.Interval = 1;
+            timer.Interval=1;
             timer.Tick += new EventHandler(simulateAnnealing);
             operate[0] = optInit;
             operate[1] = optInit;
@@ -54,7 +54,6 @@ namespace TSPsolver
         //模拟退火法
         public void simulateAnnealing(Object sender,EventArgs eve)
         {
-            
             point.CopyTo(tmpPoint, 0);
             pointf.CopyTo(tmpPointf, 0);
             whichOperate = GetNext(point, pointf);
@@ -117,37 +116,15 @@ namespace TSPsolver
                     }
                     isBlock = false;
                 }).Start();
-                
             }
             if (l1 > Limit)
             {
                 l2++;
-                new Thread((ThreadStart)delegate {
-                    try
-                    {
-                        if (origin != null) origin.Dispose();
-                        origin = new Bitmap(areaWidth, areaHeight);
-                        using (Graphics g = Graphics.FromImage(origin))
-                        {
-                            using (GraphicsPath gpath = new GraphicsPath())
-                            {
-                                gpath.AddPolygon(bestPathf);
-                                g.DrawPath(new Pen(Color.Black) { Width = 2 }, gpath);
-                                ResultArea.Image = origin;
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        MessageBox.Show(e.Message);
-                    }
-                }).Start();
-                
             }
             ticker++;
             if (ticker >= markov)
             {
-                if (l2 > BLimit)
+                if (markov==ticker && l2 > BLimit)
                 {
                     new Thread((ThreadStart)delegate {
                         try
