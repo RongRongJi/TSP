@@ -47,7 +47,7 @@ namespace TSPsolver
                 distance[i, i] = 0;
                 for (int j = i + 1; j < cityNum; j++)
                 {
-                    double rij = Math.Sqrt(((x[i] - x[j]) * (x[i] - x[j]) + (y[i] - y[j]) * (y[i] - y[j])) / 10.0);
+                    double rij = Math.Sqrt(((x[i] - x[j]) * (x[i] - x[j]) + (y[i] - y[j]) * (y[i] - y[j])) );
                     distance[i, j] = rij;
                     distance[j, i] = rij;
                 }

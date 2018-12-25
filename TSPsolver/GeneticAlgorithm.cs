@@ -56,7 +56,7 @@ namespace TSPsolver
                 distance[i, i] = 0;
                 for(int j = i + 1; j < cityNum; j++)
                 {
-                    double rij = Math.Sqrt(((x[i] - x[j]) * (x[i] - x[j]) + (y[i] - y[j]) * (y[i] - y[j])) / 10.0);
+                    double rij = Math.Sqrt(((x[i] - x[j]) * (x[i] - x[j]) + (y[i] - y[j]) * (y[i] - y[j])));
                     distance[i, j] = rij;
                     distance[j, i] = rij;
                 }
@@ -155,31 +155,6 @@ namespace TSPsolver
             }
         }
 
-        public void NormalCrossover()
-        {
-            selectBestGh();
-            select();
-            float r;
-            for (int k = 0; k < scale; k = k + 2)
-            {
-                r = (float)random.NextDouble();
-                if (r < Pc) OXCross1(k, k + 1);
-                else
-                {
-                    r = (float)random.NextDouble();
-                    if (r < Pm)
-                    {
-                        OnCVariation(k);
-                    }
-                    r = (float)random.NextDouble();
-                    if (r < Pm)
-                    {
-                        OnCVariation(k + 1);
-                    }
-                }
-            }
-        }
-
         public void NormalWithoutCross()
         {
             int k;
@@ -191,7 +166,7 @@ namespace TSPsolver
                 r = (float)random.NextDouble();
                 if (r < Pc)
                 {
-                    OXCross1(k, k + 1);
+                    OXCross(k, k + 1);
                 }
                 else
                 {
@@ -256,60 +231,7 @@ namespace TSPsolver
                 newPopulation[k2, i] = Gh2[i];
             }
         }
-
-        public void OXCross1(int k1,int k2)
-        {
-            int i, j, k, flag;
-            int ran1, ran2, tmp;
-            int[] Gh1 = new int[cityNum];
-            int[] Gh2 = new int[cityNum];
-            ran1 = random.Next(65535) % cityNum;
-            ran2 = random.Next(65535) % cityNum;
-            while (ran1 == ran2)
-            {
-                ran2 = random.Next(65535) % cityNum;
-            }
-            if (ran1 > ran2)
-            {
-                tmp = ran1;
-                ran1 = ran2;
-                ran2 = tmp;
-            }
-            for (i = 0, j = ran2; j<cityNum; i++, j++)
-            {
-                Gh2[i] = newPopulation[k1, j];
-            }
-            flag = i;
-            for (k = 0, j = flag; j < cityNum;)
-            {
-                Gh2[j] = newPopulation[k2, k++];
-                for (i = 0; i < flag; i++)
-                {
-                    if (Gh2[i] == Gh2[j]) break;
-                }
-                if (i == flag) j++;
-            }
-            flag = ran1;
-            for (k = 0, j = 0; k < cityNum;)
-            {
-                Gh1[j] = newPopulation[k1, k++];
-                for (i = 0; i < flag; i++)
-                {
-                    if (newPopulation[k2, i] == Gh1[j]) break;
-                }
-                if (i == flag) j++;
-            }
-            flag = cityNum - ran1;
-            for (i = 0, j = flag; j < cityNum; j++, i++)
-            {
-                Gh1[j] = newPopulation[k2, i];
-            }
-            for (i = 0; i < cityNum; i++)
-            {
-                newPopulation[k1, i] = Gh1[i];
-                newPopulation[k2, i] = Gh2[i];
-            }
-        }
+        
 
         public void OnCVariation(int k)
         {
@@ -344,7 +266,7 @@ namespace TSPsolver
 
         public void GAStep()
         {
-            NormalCrossover();
+            NormalWithoutCross();
             for(int k = 0; k < scale; k++)
             {
                 for(int i = 0; i < cityNum; i++)

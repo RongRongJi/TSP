@@ -23,6 +23,7 @@ namespace TSPsolver
         ShapeContainer shapeContainer_allCityShape;
         int counter_City = 0;
         List<OvalShape> ovalShape_City = new List<OvalShape>();
+        bool isCalculating;
 
         public Form1()
         {
@@ -62,6 +63,7 @@ namespace TSPsolver
         #region 画点
         private void pictureBox1_Click(object sender, MouseEventArgs e)
         {
+            if (isCalculating) return;
             Point mPosition = new Point(e.X - 10, e.Y - 10);
             create_City(mPosition);
         }
@@ -70,6 +72,13 @@ namespace TSPsolver
         #region 开启算法
         private void Start(object sender,EventArgs e)
         {
+            if(!radioButton1.Checked && !radioButton2.Checked)
+            {
+                MessageBox.Show("请选择一种算法！");
+                return;
+            }
+            if (isCalculating) return;
+            isCalculating = true;
             //遗传算法
             if (radioButton1.Checked) {
                 if (counter_City <= 2)
@@ -92,10 +101,6 @@ namespace TSPsolver
                 setThreadPriority(runtime);
                 runtime.Start();
             }
-            else
-            {
-                MessageBox.Show("请选择一种算法！");
-            }
         }
         #endregion
 
@@ -111,8 +116,8 @@ namespace TSPsolver
                 shapeContainer_allCityShape.Shapes.Add(newLine);
             }
             int scale = 60;
-            float Pc = 0.8f, Pm = 0.9f;
-            int GEN_MAX = SetMaxValue();
+            float Pc = 0.95f, Pm = 0.05f;
+            int GEN_MAX = SetGAMaxValue();
             progressBar1.Maximum = GEN_MAX;
             ga = new GeneticAlgorithm(scale, ovalShape_City.Count, GEN_MAX, Pc, Pm, ovalShape_City);
             ga.solveInit();
@@ -124,8 +129,9 @@ namespace TSPsolver
                 textBox1.Text = "遗传代数："+(i+1) + "/" + GEN_MAX;
                 richTextBox1.Text = ga.toString();
             }
+            isCalculating = false;
         }
-        private int SetMaxValue()
+        private int SetGAMaxValue()
         {
             if (counter_City == 0) return 0;
             else if (counter_City <= 5) return 100;
@@ -159,7 +165,6 @@ namespace TSPsolver
             Pen pen = new Pen(Brushes.Blue);
             g.DrawLine(pen, p1, p2);
             pictureBox1.BackgroundImage = origin;
-            Thread.Sleep(1);
         }
         #endregion
 
@@ -175,7 +180,7 @@ namespace TSPsolver
                 shapeContainer_allCityShape.Shapes.Add(newLine);
             }
             int antnum = 10;
-            int GEN_MAX = SetMaxValue();
+            int GEN_MAX = SetACAMaxValue();
             progressBar1.Maximum = GEN_MAX;
             double alpha = 1.0, beta = 5.0, rho = 0.5;
             aca = new AntColonyAlgorithm(counter_City, antnum, GEN_MAX, alpha, beta, rho, ovalShape_City);
@@ -188,6 +193,15 @@ namespace TSPsolver
                 textBox1.Text = "蚁群算法代数：" + (i + 1) + "/" + GEN_MAX;
                 richTextBox1.Text = aca.toString();
             }
+            isCalculating = false;
+        }
+        private int SetACAMaxValue()
+        {
+            if (counter_City == 0) return 0;
+            else if (counter_City <= 5) return 100;
+            else if (counter_City <= 40) return 500;
+            else if (counter_City <= 60) return 800;
+            else return 1000;
         }
         #endregion
 
@@ -213,7 +227,6 @@ namespace TSPsolver
             Pen pen = new Pen(Brushes.Blue);
             g.DrawLine(pen, p1, p2);
             pictureBox1.BackgroundImage = origin;
-            Thread.Sleep(1);
         }
         #endregion
 
@@ -290,6 +303,7 @@ namespace TSPsolver
 
         private void clearButton_Click(object sender, EventArgs e)
         {
+            if (isCalculating) return;
             ovalShape_City.Clear();
             counter_City = 0;
             Bitmap origin = new Bitmap(pictureBox1.Width, pictureBox1.Height);
