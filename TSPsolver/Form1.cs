@@ -38,6 +38,10 @@ namespace TSPsolver
             this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             this.SetStyle(ControlStyles.UserPaint, true);
             pictureBox1.BackColor = Color.White;
+            dataGridView1.ColumnCount = 2;
+            dataGridView1.ColumnHeadersVisible = true;
+            dataGridView1.Columns[0].Name = "城市编号";
+            dataGridView1.Columns[1].Name = "城市坐标";
         }
         
   
@@ -49,6 +53,7 @@ namespace TSPsolver
             newCity.Location = new Point(e.X, e.Y);
             newCity.Size = new Size(20, 20);
             ovalShape_City.Add(newCity);
+            dataGridView1.Rows.Add(counter_City,e.X+","+e.Y);
             shapeContainer_allCityShape.Shapes.Add(newCity);
             Bitmap origin = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             Graphics g = Graphics.FromImage(origin);
@@ -305,6 +310,7 @@ namespace TSPsolver
         {
             if (isCalculating) return;
             ovalShape_City.Clear();
+            dataGridView1.Rows.Clear();
             counter_City = 0;
             Bitmap origin = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             Graphics g = Graphics.FromImage(origin);
