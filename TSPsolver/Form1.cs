@@ -19,12 +19,10 @@ namespace TSPsolver
     {
 
         GeneticAlgorithm ga;
+        AntColonyAlgorithm aca;
         ShapeContainer shapeContainer_allCityShape;
-        List<LineShape> lineShape_Way = new List<LineShape>();
         int counter_City = 0;
         List<OvalShape> ovalShape_City = new List<OvalShape>();
-        Graphics gpath;
-        Graphics point;
 
         public Form1()
         {
@@ -35,49 +33,71 @@ namespace TSPsolver
             shapeContainer_allCityShape.Size = new Size(Width, Height);
             shapeContainer_allCityShape.TabIndex = 0;
             shapeContainer_allCityShape.TabStop = false;
-            //Controls.Add(shapeContainer_allCityShape);
-            gpath = this.CreateGraphics();
             this.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
-            this.BackColor = Color.White;
+            this.SetStyle(ControlStyles.UserPaint, true);
+            pictureBox1.BackColor = Color.White;
         }
         
   
-        #region create city
-
+        #region 创建城市
         private void create_City(Point e)
         {
             counter_City++;
             OvalShape newCity = new OvalShape();
-            newCity.BackColor = Color.Red;
-            newCity.BackStyle = BackStyle.Opaque;
-            newCity.Cursor = Cursors.Hand;
-            newCity.BorderColor = Color.Red;
             newCity.Location = new Point(e.X, e.Y);
             newCity.Size = new Size(20, 20);
-
             ovalShape_City.Add(newCity);
             shapeContainer_allCityShape.Shapes.Add(newCity);
-            Graphics g = this.CreateGraphics();
-            g.FillEllipse(Brushes.Black, e.X, e.Y, 10, 10);
+            Bitmap origin = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            Graphics g = Graphics.FromImage(origin);
+            for (int i = 0; i < counter_City; i++)
+            {
+                g.FillEllipse(Brushes.Black, ovalShape_City[i].Location.X - 5, ovalShape_City[i].Location.Y - 5, 10, 10);
+            }
+            pictureBox1.BackgroundImage = origin;
         }
         #endregion
 
-
-        private void Form_Click(object sender, MouseEventArgs e)
+        #region 画点
+        private void pictureBox1_Click(object sender, MouseEventArgs e)
         {
             Point mPosition = new Point(e.X - 10, e.Y - 10);
-            foreach (LineShape anyLine in lineShape_Way)
-                shapeContainer_allCityShape.Shapes.Remove(anyLine);
             create_City(mPosition);
         }
+        #endregion
 
+        #region 开启算法
         private void Start(object sender,EventArgs e)
         {
-            Thread runtime = new Thread(new ThreadStart(GA));
-            setThreadPriority(runtime);
-            runtime.Start();
+            //遗传算法
+            if (radioButton1.Checked) {
+                if (counter_City <= 2)
+                {
+                    MessageBox.Show("至少设置三个城市！");
+                    return;
+                }
+                Thread runtime = new Thread(new ThreadStart(GA));
+                setThreadPriority(runtime);
+                runtime.Start();
+            }
+            //蚁群算法
+            else if (radioButton2.Checked)
+            {
+                if (counter_City <= 2)
+                {
+                    MessageBox.Show("至少设置三个城市！");return;
+                }
+                Thread runtime = new Thread(new ThreadStart(ACA));
+                setThreadPriority(runtime);
+                runtime.Start();
+            }
+            else
+            {
+                MessageBox.Show("请选择一种算法！");
+            }
         }
+        #endregion
 
         #region 遗传算法
         public void GA()
@@ -88,43 +108,111 @@ namespace TSPsolver
                 newLine.BorderColor = Color.Blue;
                 newLine.Cursor = Cursors.Default;
                 newLine.Enabled = false;
-                lineShape_Way.Add(newLine);
                 shapeContainer_allCityShape.Shapes.Add(newLine);
             }
             int scale = 60;
             float Pc = 0.8f, Pm = 0.9f;
-            int GEN_MAX = 1000;
+            int GEN_MAX = SetMaxValue();
+            progressBar1.Maximum = GEN_MAX;
             ga = new GeneticAlgorithm(scale, ovalShape_City.Count, GEN_MAX, Pc, Pm, ovalShape_City);
             ga.solveInit();
             for (int i = 0; i < GEN_MAX; i++)
             {
                 ga.GAStep();
-                refreshTour();
+                refreshUI();
+                progressBar1.Value = i+1;
+                textBox1.Text = "遗传代数："+(i+1) + "/" + GEN_MAX;
+                richTextBox1.Text = ga.toString();
             }
+        }
+        private int SetMaxValue()
+        {
+            if (counter_City == 0) return 0;
+            else if (counter_City <= 5) return 100;
+            else if (counter_City <= 15) return 1000;
+            else if (counter_City <= 30) return 10000;
+            else if (counter_City <= 40) return 51000;
+            else if (counter_City <= 60) return 100000;
+            else return 1000000;
         }
         #endregion
 
-        #region 更新连线
-        private void refreshTour()
+        #region 遗传算法下更新UI
+        private void refreshUI()
         {
             Point p1, p2;
-            gpath.Clear(Color.White);
-            for(int i = 0; i < counter_City; i++)
+            Bitmap origin = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            Graphics g = Graphics.FromImage(origin);
+            for (int i = 0; i < counter_City; i++)
             {
-                Graphics g = this.CreateGraphics();
-                g.FillEllipse(Brushes.Black, ovalShape_City[i].Location.X-5, ovalShape_City[i].Location.Y-5, 10, 10);
+                g.FillEllipse(Brushes.Black, ovalShape_City[i].Location.X - 5, ovalShape_City[i].Location.Y - 5, 10, 10);
             }
             for (int i = 1; i < counter_City; i++)
             {
                 p1 = ovalShape_City[ga.bestTour[i]].Location;
                 p2 = ovalShape_City[ga.bestTour[i - 1]].Location;
                 Pen p = new Pen(Brushes.Blue);
-                gpath.DrawLine(p, p1, p2);
+                g.DrawLine(p, p1, p2);
             }
             p1 = ovalShape_City[ga.bestTour[counter_City - 1]].Location;
             p2 = ovalShape_City[ga.bestTour[0]].Location;
             Pen pen = new Pen(Brushes.Blue);
-            gpath.DrawLine(pen, p1, p2);
+            g.DrawLine(pen, p1, p2);
+            pictureBox1.BackgroundImage = origin;
+            Thread.Sleep(1);
+        }
+        #endregion
+
+        #region 蚁群算法
+        private void ACA()
+        {
+            for (int i = 0; i < ovalShape_City.Count; i++)
+            {
+                LineShape newLine = new LineShape();
+                newLine.BorderColor = Color.Blue;
+                newLine.Cursor = Cursors.Default;
+                newLine.Enabled = false;
+                shapeContainer_allCityShape.Shapes.Add(newLine);
+            }
+            int antnum = 10;
+            int GEN_MAX = SetMaxValue();
+            progressBar1.Maximum = GEN_MAX;
+            double alpha = 1.0, beta = 5.0, rho = 0.5;
+            aca = new AntColonyAlgorithm(counter_City, antnum, GEN_MAX, alpha, beta, rho, ovalShape_City);
+            aca.init();
+            for(int i = 0; i < GEN_MAX; i++)
+            {
+                aca.ACAStep();
+                refreshLine();
+                progressBar1.Value = i + 1;
+                textBox1.Text = "蚁群算法代数：" + (i + 1) + "/" + GEN_MAX;
+                richTextBox1.Text = aca.toString();
+            }
+        }
+        #endregion
+
+        #region 蚁群算法下更新UI
+        private void refreshLine()
+        {
+            Point p1, p2;
+            Bitmap origin = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            Graphics g = Graphics.FromImage(origin);
+            for (int i = 0; i < counter_City; i++)
+            {
+                g.FillEllipse(Brushes.Black, ovalShape_City[i].Location.X - 5, ovalShape_City[i].Location.Y - 5, 10, 10);
+            }
+            for (int i = 1; i < counter_City; i++)
+            {
+                p1 = ovalShape_City[aca.bestTour[i]].Location;
+                p2 = ovalShape_City[aca.bestTour[i - 1]].Location;
+                Pen p = new Pen(Brushes.Blue);
+                g.DrawLine(p, p1, p2);
+            }
+            p1 = ovalShape_City[aca.bestTour[counter_City - 1]].Location;
+            p2 = ovalShape_City[aca.bestTour[0]].Location;
+            Pen pen = new Pen(Brushes.Blue);
+            g.DrawLine(pen, p1, p2);
+            pictureBox1.BackgroundImage = origin;
             Thread.Sleep(1);
         }
         #endregion
@@ -157,16 +245,6 @@ namespace TSPsolver
                 shapeContainer_allCityShape.Shapes.Remove(l);
             }
         }
-
-        delegate void SetPointCallBack(int i, Point p1, Point p2);
-        private void SetPoint(int i, Point p1, Point p2)
-        {
-            lineShape_Way[i].X1 = p1.X + 10;
-            lineShape_Way[i].X2 = p2.X + 10;
-            lineShape_Way[i].Y1 = p1.Y + 10;
-            lineShape_Way[i].Y2 = p2.Y + 10;
-        }
-        #endregion
 
         private void setThreadPriority(Thread th)
         {
@@ -204,6 +282,20 @@ namespace TSPsolver
                     Thread.BeginThreadAffinity();
                 }
             }
+        }
+
+
+
+        #endregion
+
+        private void clearButton_Click(object sender, EventArgs e)
+        {
+            ovalShape_City.Clear();
+            counter_City = 0;
+            Bitmap origin = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            Graphics g = Graphics.FromImage(origin);
+            g.Clear(Color.White);
+            pictureBox1.BackgroundImage = origin;
         }
     }
 

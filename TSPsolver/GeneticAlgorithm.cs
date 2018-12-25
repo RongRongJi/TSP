@@ -360,5 +360,15 @@ namespace TSPsolver
             }
             countRate();
         }
+
+        public string toString()
+        {
+            string result = "种群规模:" + scale + "\n";
+            result += "城市数量:" + cityNum + "\n";
+            result += "交叉概率:" + Pc + "\n";
+            result += "变异概率:" + Pm + "\n";
+            result += "当前最佳路程:" + bestLength + "\n";
+            return result;
+        }
     }
 }
