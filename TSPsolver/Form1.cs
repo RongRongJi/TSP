@@ -88,6 +88,7 @@ namespace TSPsolver
             if (radioButton1.Checked) {
                 if (counter_City <= 2)
                 {
+                    isCalculating = false;
                     MessageBox.Show("至少设置三个城市！");
                     return;
                 }
@@ -121,7 +122,7 @@ namespace TSPsolver
                 shapeContainer_allCityShape.Shapes.Add(newLine);
             }
             int scale = 60;
-            float Pc = 0.95f, Pm = 0.05f;
+            float Pc = 0.90f, Pm = 0.10f;
             int GEN_MAX = SetGAMaxValue();
             progressBar1.Maximum = GEN_MAX;
             ga = new GeneticAlgorithm(scale, ovalShape_City.Count, GEN_MAX, Pc, Pm, ovalShape_City);

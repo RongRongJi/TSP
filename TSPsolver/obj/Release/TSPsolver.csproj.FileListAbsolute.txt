@@ -1,0 +1,12 @@
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\bin\Release\TSPsolver.exe.config
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\bin\Release\TSPsolver.exe
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\bin\Release\TSPsolver.pdb
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\bin\Release\Microsoft.VisualBasic.PowerPacks.Vs.dll
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Release\TSPsolver.csprojAssemblyReference.cache
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Release\TSPsolver.Form1.resources
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Release\TSPsolver.Properties.Resources.resources
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Release\TSPsolver.csproj.GenerateResource.cache
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Release\TSPsolver.csproj.CoreCompileInputs.cache
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Release\TSPsolver.csproj.CopyComplete
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Release\TSPsolver.exe
+D:\软四相关\大三上学期\人工智能\TSPsolver\TSPsolver\obj\Release\TSPsolver.pdb
